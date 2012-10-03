@@ -42,6 +42,8 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     branch = on_branch?
     if branch == 'master'
       return get_revision("#{@resource.value(:remote)}/HEAD")
+    elsif @resource.value(:revision) and tag_revision? @resource.value(:revision)
+      return get_revision(@resource.value(:revision)) # FIX ME
     elsif branch == '(no branch)'
       return get_revision('HEAD')
     else
