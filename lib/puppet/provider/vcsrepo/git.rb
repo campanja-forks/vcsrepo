@@ -43,7 +43,13 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     if branch == 'master'
       return get_revision("#{@resource.value(:remote)}/HEAD")
     elsif @resource.value(:revision) and tag_revision? @resource.value(:revision)
-      return @resource.value(:revision)
+      canonical = at_path { git_with_identity('show', @resource.value(:revision)).scan(/commit (.*)/).to_s }
+      current = at_path { git_with_identity('rev-parse', 'HEAD').chomp }
+      if current == canonical
+        @resource.value(:revision)
+      else
+        canonical
+      end
     elsif branch == '(no branch)'
       return get_revision('HEAD')
     else
