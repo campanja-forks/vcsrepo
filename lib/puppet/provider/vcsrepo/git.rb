@@ -39,19 +39,10 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def latest
-    branch = on_branch?
-    if branch == 'master'
+    if @resource.value(:revision) == 'master'
       return get_revision("#{@resource.value(:remote)}/HEAD")
-    elsif @resource.value(:revision) and tag_revision? @resource.value(:revision)
-      canonical = at_path { git_with_identity('show', @resource.value(:revision)).scan(/commit (.*)/).to_s }
-      current = at_path { git_with_identity('rev-parse', 'HEAD').chomp }
-      if current == canonical
-        @resource.value(:revision)
-      else
-        canonical
-      end
-    elsif branch == '(no branch)'
-      return get_revision('HEAD')
+    elsif tag_revision? @resource.value(:revision)
+      @resource.value(:revision)
     else
       return get_revision("#{@resource.value(:remote)}/%s" % branch)
     end
