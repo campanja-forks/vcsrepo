@@ -44,7 +44,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     elsif tag_revision? @resource.value(:revision)
       @resource.value(:revision)
     else
-      return get_revision("#{@resource.value(:remote)}/%s" % branch)
+      return get_revision("#{@resource.value(:remote)}/%s" % @resource.value(:revision))
     end
   end
 
