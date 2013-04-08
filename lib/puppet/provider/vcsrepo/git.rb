@@ -56,7 +56,8 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     if tag_revision?(@resource.value(:revision))
       canonical = at_path { git_with_identity('show', @resource.value(:revision)).scan(/commit (.*)/).to_s }
     else
-      canonical = at_path { git_with_identity('rev-parse', @resource.value(:revision)).chomp }
+      rev = local_branch_revision?(@resource.value(:revision)) ? @resource.value(:revision) : "#{@resource.value(:remote)}/%s" % @resource.value(:revision)
+      canonical = at_path { git_with_identity('rev-parse', rev).chomp }
     end
 
     if current == canonical
