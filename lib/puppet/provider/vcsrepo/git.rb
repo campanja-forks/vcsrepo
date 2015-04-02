@@ -256,6 +256,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   # @!visibility private
   def update_submodules
     at_path do
+      git_with_identity('submodule', 'sync')
       git_with_identity('submodule', 'update', '--init', '--recursive')
     end
   end
