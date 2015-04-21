@@ -327,7 +327,11 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     create if !working_copy_exists?
 
     if branch = on_branch?
-      return get_revision("#{@resource.value(:remote)}/#{branch}")
+      if at_path { git_with_identity('branch', '-r').match /#{@resource.value(:remote)}\/#{branch}/ }
+        return get_revision("#{@resource.value(:remote)}/#{branch}")
+      else
+        return get_revision
+      end
     else
       return get_revision
     end
